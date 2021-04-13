@@ -50,8 +50,9 @@ public class JwtProvider {
         }
     }
 
-    public void validateToken(String jwt){
-        parser().setSigningKey(getPublickey());
+    public boolean validateToken(String jwt) {
+        parser().setSigningKey(getPublickey()).parseClaimsJws(jwt);
+        return true;
     }
 
     private PublicKey getPublickey() {
@@ -61,6 +62,14 @@ public class JwtProvider {
             throw new SpringRedditException("Exception occured while " +
                     "retrieving public key from keystore", e);
         }
+    }
+
+    public String getUsernameFromJwt(String token){
+        Claims claims = parser()
+                .setSigningKey(getPublickey())
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 
 
