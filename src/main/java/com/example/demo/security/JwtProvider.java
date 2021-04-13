@@ -4,6 +4,7 @@ package com.example.demo.security;
 import com.example.demo.exceptions.SpringRedditException;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+
+import static io.jsonwebtoken.Jwts.parser;
 
 @Service
 public class JwtProvider {
@@ -46,5 +49,19 @@ public class JwtProvider {
             throw new SpringRedditException("Exception occured while retrieving public key from keystore", e);
         }
     }
+
+    public void validateToken(String jwt){
+        parser().setSigningKey(getPublickey());
+    }
+
+    private PublicKey getPublickey() {
+        try {
+            return keyStore.getCertificate("springblog").getPublicKey();
+        } catch (KeyStoreException e) {
+            throw new SpringRedditException("Exception occured while " +
+                    "retrieving public key from keystore", e);
+        }
+    }
+
 
 }
